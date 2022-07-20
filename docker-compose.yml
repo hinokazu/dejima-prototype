@@ -1,8 +1,8 @@
-version: '3'
-services:
-  peera-db:
-    image: ekayim/dejima-nonvpg
-    container_name: PeerA-db
+File : dejima - prototype - master / docker - compose . yml
+
+peera-db:
+    image : dejima - stretch - db
+    container_name : PeerA - db
     ports:
         - 54321:5432
     volumes:
@@ -10,98 +10,32 @@ services:
         - ./db/initialize.sh:/docker-entrypoint-initdb.d/initialize.sh
         - ./db/setup_files:/etc/setup_files
     environment:
-        - PEER_NAME=PeerA 
-        - DEJIMA_EXECUTION_ENDPOINT=PeerA-proxy:8000/execute
-        - DEJIMA_TERMINATION_ENDPOINT=PeerA-proxy:8000/terminate
+    - POSTGRES_PASSWORD = postgres
+    - PEER_NAME = PeerA
+    - DEJIMA_EXECUTION_ENDPOINT = PeerA - proxy :8000/ execute
+    - DEJIMA_TERMINATION_ENDPOINT = PeerA - proxy :8000/ terminate
     networks:
         dejima_net:
             ipv4_address: 172.30.0.3
+            
+mediator - db :
+    image : dejima - stretch - db
+    container_name : Mediator - db
+    ports :
+    - 54323:5432
+volumes :
+- ./ db / postgresql . conf :/ etc / postgresql . conf
+- ./ db / initialize . sh :/ docker - entrypoint - initdb .d/ initialize . sh
+- ./ db / setup_files :/ etc / setup_files
+environment :
+- POSTGRES_PASSWORD = postgres
+- PEER_NAME = Mediator
+- DEJIMA_EXECUTION_ENDPOINT = Mediator - proxy :8000/ execute
+- DEJIMA_TERMINATION_ENDPOINT = Mediator - proxy :8000/ terminate
 
-  peera-proxy:
-    image: ekayim/dejima-proxy:latest
-    container_name: PeerA-proxy
-    command: gunicorn -b 0.0.0.0:8000 --threads 3 server:app
-    volumes:
-        - ./proxy:/code
-    ports:
-        - 8001:8000
-    depends_on:
-        - peera-db
-    environment: 
-        - PEER_NAME=PeerA 
-    networks:
-        dejima_net:
-            ipv4_address: 172.30.0.4
+networks :
+dejima_net :
+ipv4_address : 172.30.0.9
+            
 
-  peerb-db:
-    image: ekayim/dejima-nonvpg
-    container_name: PeerB-db
-    ports:
-        - 54322:5432
-    volumes:
-        - ./db/postgresql.conf:/etc/postgresql.conf
-        - ./db/initialize.sh:/docker-entrypoint-initdb.d/initialize.sh
-        - ./db/setup_files:/etc/setup_files
-    environment:
-        - PEER_NAME=PeerB 
-        - DEJIMA_EXECUTION_ENDPOINT=PeerB-proxy:8000/execute
-        - DEJIMA_TERMINATION_ENDPOINT=PeerB-proxy:8000/terminate
-    networks:
-        dejima_net:
-            ipv4_address: 172.30.0.6
-
-  peerb-proxy:
-    image: ekayim/dejima-proxy:latest
-    container_name: PeerB-proxy
-    command: gunicorn -b 0.0.0.0:8000 --threads 3 server:app
-    volumes:
-        - ./proxy:/code
-    ports:
-        - 8002:8000
-    depends_on:
-        - peerb-db
-    environment: 
-        - PEER_NAME=PeerB 
-    networks:
-        dejima_net:
-            ipv4_address: 172.30.0.7
-
-  mediator-db:
-    image: ekayim/dejima-nonvpg
-    container_name: Mediator-db
-    ports:
-        - 54323:5432
-    volumes:
-        - ./db/postgresql.conf:/etc/postgresql.conf
-        - ./db/initialize.sh:/docker-entrypoint-initdb.d/initialize.sh
-        - ./db/setup_files:/etc/setup_files
-    environment:
-        - PEER_NAME=Mediator 
-        - DEJIMA_EXECUTION_ENDPOINT=Mediator-proxy:8000/execute
-        - DEJIMA_TERMINATION_ENDPOINT=Mediator-proxy:8000/terminate
-    networks:
-        dejima_net:
-            ipv4_address: 172.30.0.9
-
-  mediator-proxy:
-    image: ekayim/dejima-proxy:latest
-    container_name: Mediator-proxy
-    command: gunicorn -b 0.0.0.0:8000 --threads 3 server:app
-    volumes:
-        - ./proxy:/code
-    ports:
-        - 8003:8000
-    depends_on:
-        - mediator-db
-    environment: 
-        - PEER_NAME=Mediator 
-    networks:
-        dejima_net:
-            ipv4_address: 172.30.0.10
-networks:
-  dejima_net:
-    driver: bridge
-    ipam:
-     driver: default
-     config:
-       - subnet: 172.30.0.0/24
+ 
