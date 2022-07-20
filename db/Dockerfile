@@ -1,16 +1,17 @@
-FROM mypg:11.2-alpine
-# FROM postgres:11.2-alpine
-# FROM postgres:11-alpine
+File:dejima-prototype-master/db/Dockerfile
 
-LABEL maintaner "miyake <miyake.kouta@ist.osaka-u.ac.jp>"
+FROM postgres:11-stretch
 
-RUN apk add --update --no-cache \
-    build-base \
-    bash \
+RUN apt-get update -y \
+  && apt-get install -y \
+    sudo \
+    vim \
     curl \
     git \
+    gcc \
     make \
-  && rm -rf /var/cache/apk/*
+    postgresql -server-dev-11 \
+  && rm -rf /var/cache/apt/*
 
 RUN git clone https://github.com/petere/plsh \
   && cd plsh && git checkout 9b108516a005a0592d9c9e145189825f92f820e1 \
